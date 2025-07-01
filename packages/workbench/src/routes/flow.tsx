@@ -1,9 +1,8 @@
 import { FlowView } from '@/views/flow/flow-view'
-import { useParams } from 'react-router'
 import { useFetchFlows } from '@/hooks/use-fetch-flows'
 
 export const Flow = () => {
-  const { id } = useParams()
+  const id = window.location.pathname.split('/').pop()
   const { flow, flowConfig } = useFetchFlows(id!)
 
   if (!flow || flow.error)

@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link, useLocation } from 'react-router'
 import { BadgeCount } from '../ui/BadgeCount'
 import { LogoIcon } from '../ui/logo-icon'
 import {
@@ -17,42 +16,43 @@ import { NavigationMenuSub } from '@radix-ui/react-navigation-menu'
 import { Workflow } from 'lucide-react'
 
 export const Header: React.FC = () => {
-  const { pathname } = useLocation()
+  // const { pathname } = useLocation()
+  const pathname = ''
   const { flows } = useListFlows()
   const isActive = (flowId: string) => pathname.includes(`/flow/${flowId}`)
 
   return (
-    <header className="min-h-16 px-4 gap-1 flex items-center bg-header text-header-foreground border-b border-header-border">
+    <header className="min-h-16 px-4 gap-1 flex items-center bg-default text-default-foreground border-b">
       <LogoIcon className="h-8 w-8 mr-16" />
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
-              <Link data-testid="header-logs-link" to="/logs" className={'flex flex-row items-center pr-2 relative'}>
+              <a data-testid="header-logs-link" href="/logs" className={'flex flex-row items-center pr-2 relative'}>
                 Logs
                 <BadgeCount className="absolute top-1 right-0" dotOnly={true} />
-              </Link>
+              </a>
             </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
-              <Link data-testid="header-traces-link" to="/traces">
+              <a data-testid="header-traces-link" href="/traces">
                 Traces
-              </Link>
+              </a>
             </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
-              <Link data-testid="header-states-link" to="/states">
+              <a data-testid="header-states-link" href="/states">
                 States
-              </Link>
+              </a>
             </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
-              <Link data-testid="header-endpoints-link" to="/endpoints">
+              <a data-testid="header-endpoints-link" href="/endpoints">
                 Endpoints
-              </Link>
+              </a>
             </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>
@@ -70,13 +70,13 @@ export const Header: React.FC = () => {
                   {flows.map((flow) => (
                     <NavigationMenuItem key={flow.id} className="w-full" asChild>
                       <NavigationMenuLink asChild active={isActive(flow.id)}>
-                        <Link
+                        <a
                           data-testid={`flow-${flow.name}-link`}
-                          to={`/flow/${flow.id}`}
+                          href={`/flow/${flow.id}`}
                           className={'flex flex-row gap-2 items-center'}
                         >
                           <Workflow className="w-4 h-4" /> {flow.name}
-                        </Link>
+                        </a>
                       </NavigationMenuLink>
                     </NavigationMenuItem>
                   ))}
