@@ -1,80 +1,95 @@
-import React, { useCallback, useRef } from 'react'
+import React from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
 import { Header } from './components/header/header'
-import { Container, ContainerContent, ContainerHeader } from '@motiadev/ui'
-import { RefreshCw } from 'lucide-react'
-import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
-import { Button } from '@/components/ui/button'
+import { CollapsiblePanel, CollapsiblePanelGroup, TabsContent, TabsList, TabsTrigger } from '@motiadev/ui'
+import { Link2, Workflow } from 'lucide-react'
 
 export const App: React.FC = () => {
-  const topPanelRef = useRef<ImperativePanelHandle>(null)
-  const bottomPanelRef = useRef<ImperativePanelHandle>(null)
-
-  const collapsePanel = useCallback(
-    (to: 'top' | 'bottom') => {
-      const panel = to === 'top' ? topPanelRef.current : bottomPanelRef.current
-      if (!panel) return
-
-      console.log(panel.getSize())
-      // if (panel.isCollapsed()) {
-      panel.resize(panel.getSize() > 4 ? 4 : 50)
-      // } else {
-      //   panel.collapse()
-      // }
-    },
-    [topPanelRef, bottomPanelRef],
-  )
-
   return (
-    <div className="flex flex-col bg-background text-foreground h-screen">
+    <div className="flex flex-col bg-background text-foreground h-screen overflow-hidden">
       <ReactFlowProvider>
         <Header />
-        <div className={'m-2 flex flex-col h-full'}>
-          <PanelGroup direction="vertical" className={'gap-1'}>
-            <Panel collapsible ref={topPanelRef}>
-              <Container className={'min-h-[40px]'}>
-                <ContainerHeader className={'gap-2'}>
-                  <h4>Container Header 1</h4>
-                  <div className="flex-1"></div>
-                  <Button variant="outline" onClick={() => collapsePanel('top')}>
-                    <RefreshCw className="w-4 h-4" />
-                  </Button>
-                </ContainerHeader>
-                <ContainerContent>
-                  Lorem ipsum dolor sit amet consectetur adipiscing elit Nullam in dui mauris Vivamus hendrerit arcu sed
-                  erat molestie posuere sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Donec convallis
-                  lectus a urna semper rhoncus Nullam quis neque libero Class aptent taciti sociosqu ad litora torquent
-                  per conubia nostra, per inceptos himenaeos. Nullam quis neque libero Class aptent taciti sociosqu ad
-                  litora torquent per conubia nostra, per inceptos himenaeos. Nullam quis neque libero Class aptent
-                  taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
-                </ContainerContent>
-              </Container>
-            </Panel>
+        <main className="m-2 flex flex-col h-full min-h-0" role="main">
+          <CollapsiblePanelGroup direction="vertical" className="gap-1 h-full" aria-label="Workbench panels">
+            <CollapsiblePanel
+              id="top-panel"
+              variant={'tabs'}
+              defaultTab={'flow'}
+              header={
+                <TabsList>
+                  <TabsTrigger value="flow">
+                    <Workflow /> Flow
+                  </TabsTrigger>
+                  <TabsTrigger value="endpoint">
+                    <Link2 />
+                    Endpoint
+                  </TabsTrigger>
+                </TabsList>
+              }
+            >
+              <TabsContent value="flow" className={'m-5'}>
+                <h3 className="font-bold text-lg mb-4">Flow</h3>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu
+                  sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.
+                </p>
+              </TabsContent>
+              <TabsContent value="endpoint" className={'m-5'}>
+                <h3 className="font-bold text-lg mb-4">Endpoint</h3>
+                <p>
+                  Curabitur sit amet magna quam. Praesent in libero vel turpis pellentesque egestas sit amet vel nunc.
+                  Nunc consectetur, justo sed laoreet ullamcorper, ipsum enim fringilla lectus, eu egestas lectus ex et
+                  nibh.
+                </p>
+              </TabsContent>
+            </CollapsiblePanel>
 
-            <PanelResizeHandle />
-            <Panel collapsible ref={bottomPanelRef}>
-              <Container>
-                <ContainerHeader className={'gap-2'}>
-                  <h4>Container Header 2</h4>
-                  <div className="flex-1"></div>
-                  <Button variant="outline" onClick={() => collapsePanel('bottom')}>
-                    <RefreshCw className="w-4 h-4" />
-                  </Button>
-                </ContainerHeader>
-                <ContainerContent>
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur adipiscing elit Nullam in dui mauris Vivamus hendrerit arcu
-                    sed erat molestie posuere sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Donec
-                    convallis lectus a urna semper rhoncus Nullam quis neque libero Class aptent taciti sociosqu ad
-                    litora torquent per conubia nostra, per inceptos himenaeos. Nullam quis neque libero Class aptent
-                    taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nullam quis neque
-                    libero Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
-                  </p>
-                </ContainerContent>
-              </Container>
-            </Panel>
-          </PanelGroup>
-        </div>
+            <CollapsiblePanel
+              id="bottom-panel"
+              variant={'tabs'}
+              defaultTab={'tracing'}
+              header={
+                <TabsList>
+                  <TabsTrigger value="tracing">
+                    <Workflow /> Tracing
+                  </TabsTrigger>
+                  <TabsTrigger value="logs">
+                    <Link2 />
+                    Logs
+                  </TabsTrigger>
+                  <TabsTrigger value="states">
+                    <Link2 />
+                    States
+                  </TabsTrigger>
+                </TabsList>
+              }
+            >
+              <TabsContent value="tracing" className={'m-5'}>
+                <h3 className="font-bold text-lg mb-4">Tracing</h3>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu
+                  sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.
+                </p>
+              </TabsContent>
+              <TabsContent value="logs" className={'m-5'}>
+                <h3 className="font-bold text-lg mb-4">Logs</h3>
+                <p>
+                  Curabitur sit amet magna quam. Praesent in libero vel turpis pellentesque egestas sit amet vel nunc.
+                  Nunc consectetur, justo sed laoreet ullamcorper, ipsum enim fringilla lectus, eu egestas lectus ex et
+                  nibh.
+                </p>
+              </TabsContent>
+              <TabsContent value="states" className={'m-5'}>
+                <h3 className="font-bold text-lg mb-4">States</h3>
+                <p>
+                  Curabitur sit amet magna quam. Praesent in libero vel turpis pellentesque egestas sit amet vel nunc.
+                  Nunc consectetur, justo sed laoreet ullamcorper, ipsum enim fringilla lectus, eu egestas lectus ex et
+                  nibh.
+                </p>
+              </TabsContent>
+            </CollapsiblePanel>
+          </CollapsiblePanelGroup>
+        </main>
       </ReactFlowProvider>
     </div>
   )

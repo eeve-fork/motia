@@ -1,0 +1,120 @@
+import React, { PropsWithChildren, ReactNode, useCallback, useMemo, useRef, useState } from 'react'
+import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
+import { Container, ContainerContent, ContainerHeader, ContainerHeaderProps } from '@/components/ui/container.tsx'
+import { Button } from '@/components/ui/button.tsx'
+import { ChevronDown } from 'lucide-react'
+import { cn } from '@/lib/utils.ts'
+import { Tabs } from '@/components/ui/tabs.tsx'
+
+export interface CollapsiblePanelProps extends PropsWithChildren {
+  id: string
+  header: ReactNode
+  withResizeHandle?: boolean
+  className?: string
+  variant?: ContainerHeaderProps['variant']
+  defaultTab?: string
+}
+
+interface PanelControlProps {
+  header: ReactNode
+  isCollapsed: boolean
+  onToggle?: () => void
+  variant?: ContainerHeaderProps['variant']
+}
+
+const PanelControls: React.FC<PanelControlProps> = ({ header, isCollapsed, onToggle, variant = 'default' }) => {
+  console.log({ variant })
+  return (
+    <ContainerHeader variant={variant}>
+      {header}
+      <div className="flex-1" />
+      {onToggle && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggle}
+          className={cn({
+            'mr-5': variant === 'tabs',
+          })}
+        >
+          <ChevronDown
+            className={cn('w-6 h-6 transition-transform', {
+              '-rotate-90': !isCollapsed,
+            })}
+          />
+        </Button>
+      )}
+    </ContainerHeader>
+  )
+}
+
+export const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({
+  id,
+  header,
+  children,
+  withResizeHandle = true,
+  className,
+  variant,
+  defaultTab,
+}) => {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const panelRef = useRef<ImperativePanelHandle>(null)
+
+  const onToggle = useCallback(() => {
+    const panel = panelRef.current
+    if (!panel) return
+
+    try {
+      if (panel.isCollapsed()) {
+        panel.expand(50)
+      } else {
+        panel.collapse()
+      }
+    } catch (error) {
+      console.warn('Failed to toggle panel:', error)
+    }
+  }, [])
+
+  const onCollapse = useCallback(() => setIsCollapsed(true), [])
+  const onExpand = useCallback(() => setIsCollapsed(false), [])
+
+  const view = useMemo(() => {
+    const container = (
+      <Container className="h-full">
+        <PanelControls
+          header={header}
+          isCollapsed={isCollapsed}
+          variant={variant}
+          onToggle={withResizeHandle ? onToggle : undefined}
+        />
+        <ContainerContent>{children}</ContainerContent>
+      </Container>
+    )
+    if (variant == 'tabs') {
+      return (
+        <Tabs className="h-full" defaultValue={defaultTab}>
+          {container}
+        </Tabs>
+      )
+    }
+    return container
+  }, [variant, isCollapsed, header, children, defaultTab, withResizeHandle, onToggle])
+
+  return (
+    <Panel
+      id={id}
+      collapsible
+      ref={panelRef}
+      className={cn('min-h-[42px]', className)}
+      onCollapse={onCollapse}
+      onExpand={onExpand}
+    >
+      {view}
+      {withResizeHandle && <PanelResizeHandle aria-label="Resize panels" />}
+    </Panel>
+  )
+}
+
+export const CollapsiblePanelGroup: React.FC<React.ComponentProps<typeof PanelGroup>> = (props) => {
+  return <PanelGroup {...props} />
+}
