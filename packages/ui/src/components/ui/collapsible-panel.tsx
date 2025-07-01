@@ -23,7 +23,6 @@ interface PanelControlProps {
 }
 
 const PanelControls: React.FC<PanelControlProps> = ({ header, isCollapsed, onToggle, variant = 'default' }) => {
-  console.log({ variant })
   return (
     <ContainerHeader variant={variant}>
       {header}
