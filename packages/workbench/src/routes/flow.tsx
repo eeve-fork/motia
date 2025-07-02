@@ -1,9 +1,10 @@
 import { FlowView } from '@/views/flow/flow-view'
 import { useFetchFlows } from '@/hooks/use-fetch-flows'
+import { useFlow } from '@/hooks/use-flow'
 
 export const Flow = () => {
-  const id = window.location.pathname.split('/').pop()
-  const { flow, flowConfig } = useFetchFlows(id!)
+  const { currentFlow } = useFlow()
+  const { flow, flowConfig } = useFetchFlows(currentFlow?.id)
 
   if (!flow || flow.error)
     return (

@@ -2,7 +2,7 @@ import React, { PropsWithChildren, ReactNode, useCallback, useMemo, useRef, useS
 import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import { Container, ContainerContent, ContainerHeader, ContainerHeaderProps } from '@/components/ui/container.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Equal } from 'lucide-react'
 import { cn } from '@/lib/utils.ts'
 import { Tabs } from '@/components/ui/tabs.tsx'
 
@@ -47,11 +47,25 @@ const PanelControls: React.FC<PanelControlProps> = ({ header, isCollapsed, onTog
   )
 }
 
+const CustomResizeHandle: React.FC = () => {
+  return (
+    <div className="relative">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <PanelResizeHandle className="group relative">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-background border border-border">
+            <Equal className="h-4 w-4 text-muted-foreground" />
+          </div>
+        </PanelResizeHandle>
+      </div>
+    </div>
+  )
+}
+
 export const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({
   id,
   header,
   children,
-  withResizeHandle = true,
+  withResizeHandle,
   className,
   variant,
   defaultTab,
@@ -65,7 +79,7 @@ export const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({
 
     try {
       if (panel.isCollapsed()) {
-        panel.expand(50)
+        panel.expand()
       } else {
         panel.collapse()
       }
@@ -80,12 +94,7 @@ export const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({
   const view = useMemo(() => {
     const container = (
       <Container className="h-full">
-        <PanelControls
-          header={header}
-          isCollapsed={isCollapsed}
-          variant={variant}
-          onToggle={withResizeHandle ? onToggle : undefined}
-        />
+        <PanelControls header={header} isCollapsed={isCollapsed} variant={variant} onToggle={onToggle} />
         <ContainerContent>{children}</ContainerContent>
       </Container>
     )
@@ -97,23 +106,42 @@ export const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({
       )
     }
     return container
-  }, [variant, isCollapsed, header, children, defaultTab, withResizeHandle, onToggle])
+  }, [variant, isCollapsed, header, children, defaultTab, onToggle])
 
   return (
-    <Panel
-      id={id}
-      collapsible
-      ref={panelRef}
-      className={cn('min-h-[42px]', className)}
-      onCollapse={onCollapse}
-      onExpand={onExpand}
-    >
-      {view}
-      {withResizeHandle && <PanelResizeHandle aria-label="Resize panels" />}
-    </Panel>
+    <>
+      <Panel
+        id={id}
+        collapsible
+        ref={panelRef}
+        className={cn('min-h-[42px]', className)}
+        onCollapse={onCollapse}
+        onExpand={onExpand}
+      >
+        {view}
+      </Panel>
+      {withResizeHandle && <CustomResizeHandle />}
+    </>
   )
 }
 
-export const CollapsiblePanelGroup: React.FC<React.ComponentProps<typeof PanelGroup>> = (props) => {
-  return <PanelGroup {...props} />
+export const CollapsiblePanelGroup: React.FC<React.ComponentProps<typeof PanelGroup>> = ({ children, ...props }) => {
+  const [resizeHandleCount, setResizeHandleCount] = useState(0)
+  return (
+    <PanelGroup
+      onLayout={(sizes) => {
+        setResizeHandleCount(sizes.length)
+      }}
+      {...props}
+    >
+      {React.Children.map(children, (child, index) => {
+        if (React.isValidElement<CollapsiblePanelProps>(child)) {
+          const last = resizeHandleCount - 1 === index
+          const hasResizeHandle = resizeHandleCount > 1
+          return React.cloneElement(child, { withResizeHandle: hasResizeHandle && !last })
+        }
+        return child
+      })}
+    </PanelGroup>
+  )
 }

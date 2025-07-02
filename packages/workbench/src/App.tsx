@@ -3,6 +3,11 @@ import { ReactFlowProvider } from '@xyflow/react'
 import { Header } from './components/header/header'
 import { CollapsiblePanel, CollapsiblePanelGroup, TabsContent, TabsList, TabsTrigger } from '@motiadev/ui'
 import { Link2, Workflow } from 'lucide-react'
+import { Flow } from '@/routes/flow'
+import { Logs } from '@/components/logs/logs'
+import { Endpoints } from '@/components/endpoints/endpoints'
+import { States } from '@/components/states/states'
+import { TracesPage } from '@/routes/traces-page'
 
 export const App: React.FC = () => {
   return (
@@ -10,7 +15,12 @@ export const App: React.FC = () => {
       <ReactFlowProvider>
         <Header />
         <main className="m-2 flex flex-col h-full min-h-0" role="main">
-          <CollapsiblePanelGroup direction="vertical" className="gap-1 h-full" aria-label="Workbench panels">
+          <CollapsiblePanelGroup
+            autoSaveId={'app-panel'}
+            direction="vertical"
+            className="gap-1 h-full"
+            aria-label="Workbench panels"
+          >
             <CollapsiblePanel
               id="top-panel"
               variant={'tabs'}
@@ -27,20 +37,11 @@ export const App: React.FC = () => {
                 </TabsList>
               }
             >
-              <TabsContent value="flow" className={'m-5'}>
-                <h3 className="font-bold text-lg mb-4">Flow</h3>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu
-                  sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.
-                </p>
+              <TabsContent value="flow" className={'h-full'}>
+                <Flow />
               </TabsContent>
-              <TabsContent value="endpoint" className={'m-5'}>
-                <h3 className="font-bold text-lg mb-4">Endpoint</h3>
-                <p>
-                  Curabitur sit amet magna quam. Praesent in libero vel turpis pellentesque egestas sit amet vel nunc.
-                  Nunc consectetur, justo sed laoreet ullamcorper, ipsum enim fringilla lectus, eu egestas lectus ex et
-                  nibh.
-                </p>
+              <TabsContent value="endpoint">
+                <Endpoints />
               </TabsContent>
             </CollapsiblePanel>
 
@@ -64,28 +65,22 @@ export const App: React.FC = () => {
                 </TabsList>
               }
             >
-              <TabsContent value="tracing" className={'m-5'}>
-                <h3 className="font-bold text-lg mb-4">Tracing</h3>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu
-                  sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.
-                </p>
+              <TabsContent value="tracing" className="max-h-fit">
+                <TracesPage />
               </TabsContent>
-              <TabsContent value="logs" className={'m-5'}>
-                <h3 className="font-bold text-lg mb-4">Logs</h3>
-                <p>
-                  Curabitur sit amet magna quam. Praesent in libero vel turpis pellentesque egestas sit amet vel nunc.
-                  Nunc consectetur, justo sed laoreet ullamcorper, ipsum enim fringilla lectus, eu egestas lectus ex et
-                  nibh.
-                </p>
+              <TabsContent value="logs">
+                <Logs />
               </TabsContent>
-              <TabsContent value="states" className={'m-5'}>
-                <h3 className="font-bold text-lg mb-4">States</h3>
-                <p>
-                  Curabitur sit amet magna quam. Praesent in libero vel turpis pellentesque egestas sit amet vel nunc.
-                  Nunc consectetur, justo sed laoreet ullamcorper, ipsum enim fringilla lectus, eu egestas lectus ex et
-                  nibh.
-                </p>
+              <TabsContent value="states">
+                <div className="w-full h-full overflow-hidden bg-background text-foreground">
+                  <header className="p-4 border-b border-border">
+                    <h1 className="text-xl font-bold text-foreground">State details</h1>
+                    <span className="text-sm text-muted-foreground">
+                      Check all states saved locally along with all fields
+                    </span>
+                  </header>
+                  <States />
+                </div>
               </TabsContent>
             </CollapsiblePanel>
           </CollapsiblePanelGroup>
