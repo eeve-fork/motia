@@ -92,7 +92,7 @@ export const MultiplePanels: Story = {
             </div>
           }
         >
-          <div className="p-4">
+          <div className="p-4" tabIndex={0}>
             <div className="space-y-2">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -158,7 +158,7 @@ export const MultiplePanels: Story = {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">flow.state</span>
-                <span className="text-blue-600">processing</span>
+                <span className="text-blue-500">processing</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">queue.length</span>

@@ -32,6 +32,7 @@ const PanelControls: React.FC<PanelControlProps> = ({ header, isCollapsed, onTog
           variant="ghost"
           size="sm"
           onClick={onToggle}
+          aria-label={isCollapsed ? 'Expand panel' : 'Collapse panel'}
           className={cn({
             'mr-5': variant === 'tabs',
           })}
