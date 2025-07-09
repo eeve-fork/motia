@@ -26,25 +26,35 @@ This RFC proposes an RBAC mechanism for the Motia Streams feature. Currently, an
 
 ### Client Message Format
 
-Motia Client Library will send a message of type `authentication` with the token as soon as it connects to the server.
+Motia Client Library will send a header `Authentication` with the token in the WebSocket connection request.
 
-```json
-{
-  "type": "authentication",
-  "data": {
-    "token": "string"
-  }
-}
+```
+Authentication: <token>
 ```
 
-The Websocket server will ultimately invoke the defined authentication function defined in the project.
+The Websocket server will then invoke the defined authentication function defined in the project before creating the connection.
 
 ### Defining the authentication function
 
-Developers need to create a file called `/motia/stream-auth.ts` to define the authentication function.
+Developers need to create a file called `/motia/stream-auth.ts` or `/motia/stream_auth.py` to define the authentication function.
+
 The file content should export an `authenticate` function that should receive only one parameter, the token, in string.
 
+The function can return a `StreamAuthContext` object or `null` if the authentication fails.
+The file can also export a type called contextSchema using zod
+
+**TypeScript Example**
+
 ```typescript
+// Define your Stream auth context model using zod
+export const contextSchema = z.object({
+  userId: z.string(),
+  userName: z.string(),
+  userStatus: z.enum(['active', 'inactive']),
+  projectIds: z.array(z.string()),
+})
+
+// Function's name needs to be `authenticate`
 export async function authenticate(token: string): Promise<StreamAuthContext | null> {
   // returning null means the user is not authenticated and will be considered anonymous
   // anonymous users can still have access to streams depending on the logic
@@ -52,19 +62,30 @@ export async function authenticate(token: string): Promise<StreamAuthContext | n
 }
 ```
 
-The function can return a `StreamAuthContext` object or `null` if the authentication fails.
-The file can also export a type called contextSchema using zod
+**Python Example**
 
-```typescript
-export const contextSchema = z.object({
-  userId: z.string(),
-  userName: z.string(),
-  userStatus: z.enum(['active', 'inactive']),
-  projectIds: z.array(z.string()),
-})
+```python
+from pydantic import BaseModel
+from typing import Literal, List
+
+# Define your Stream auth context model using Pydantic
+class StreamAuthContext(BaseModel):
+    userId: str
+    userName: str
+    userStatus: Literal["active", "inactive"]
+    projectIds: List[str]
+
+# Exports the schema to Motia Framework
+contextSchema = StreamAuthContext.model_json_schema()
+
+# Function's name needs to be `authenticate`
+async def authenticate(token: str) -> StreamAuthContext | None:
+    # returning None means the user is not authenticated and will be considered anonymous
+    # anonymous users can still have access to streams depending on the logic
+    return None
 ```
 
-Motia framework will automatically create the `StreamAuthContext` object based on the `contextSchema` type inside `types.d.ts` file for the project.
+Motia framework will automatically create the `StreamAuthContext` object based on the `contextSchema` type inside `types.d.ts` file for the project. From the example above, it should generate the following type:
 
 ```typescript
 interface StreamAuthContext {
@@ -95,6 +116,8 @@ export const config: StreamConfig = {
 ```
 
 Users will be able to control whoever has access to a stream subscription using the `checkAccess` function.
+
+**TypeScript Example**
 
 ```typescript
 export const config: StreamConfig = {
@@ -132,13 +155,11 @@ sequenceDiagram
     participant Server
     participant AuthFunction
 
-    Client->>Server: Connect
-    Server-->>Client: Connected
-    Client->>Server: Send message (authenticate)
+    Client->>Server: Connect (with auth header)
     Server->>AuthFunction: Authenticate
     AuthFunction-->>Server: Return result (context or null)
     Note over Server: Server stores auth result securely<br/>attached to the connection
-    Server-->>Client: Returns ack message (success or error)
+    Server-->>Client: Connected
 ```
 
 ### Flow of subscription in Motia Streams client
