@@ -39,7 +39,7 @@ The main challenges are around self-hosting limitations:
 - Missing a Motia provided self hosting solution
 - Missing documentation for self-hosting options
 - Missing a self-hosting example
-- Lack of self-hosting options creates a barrier for first entry users to try Motia in a production environment (specifically those who don't want to marry into Motia Cloud)
+- Lack of self-hosting options creates a barrier for first entry users to try Motia in a production environment
 
 ## Goals
 
@@ -62,7 +62,7 @@ Optional: List nice-to-have objectives that aren't critical for the first implem
 These might be addressed in future iterations.
 -->
 
-1. Configurable event queue and storage system (Motia cloud provides out of the box SQS and DynamoDB)
+1. Configurable event queue and storage system
 2. Improved runtime using Go
 
 ### Non-Goals
@@ -121,6 +121,4 @@ This helps guide the review process.
 
 ## Conclusion
 
-Providing a self-hosting option for Motia will allow users to evaluate a Motia application in a "production" like environment, without the need to marry into Motia Cloud. This will close the gap with users who don't want to use Motia Cloud yet, but enjoy building their flows with Motia giving them a more seamless experience.
-
-This can also help highlight the benefits of using Motia Cloud over self-hosting.
+Providing a self-hosting option for Motia will allow users to evaluate a Motia application in a "production" like environment.
