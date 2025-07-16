@@ -1,5 +1,4 @@
-import { Badge } from '@/components/ui/badge'
-import { Panel } from '@motiadev/ui'
+import { Badge, Panel } from '@motiadev/ui'
 import { Copy, Database, Hash } from 'lucide-react'
 import React, { useMemo } from 'react'
 import JsonView from 'react18-json-view'
