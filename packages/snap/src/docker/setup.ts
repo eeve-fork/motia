@@ -2,6 +2,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as readline from 'readline'
 import { printMotiaDockerIntro } from './utils/print-intro'
+import { identifyUser } from '@/utils/analytics'
+import { getProjectIdentifier, trackEvent } from '@motiadev/core'
 
 const updatePackageJson = (): void => {
   const packageJsonPath = path.join(process.cwd(), 'package.json')
@@ -40,26 +42,10 @@ const createDockerfile = async () => {
     }
   }
 
-  const dockerfileContent = `# Specify platform to match your target architecture
-FROM --platform=linux/arm64 motiadev/motia-docker:latest
-
-# Install Dependencies
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Move application files
-COPY . .
-
-# Enable the following lines if you are using python steps!!!
-# # Setup python steps dependencies
-# RUN npx motia@latest install
-
-# Expose outside access to the motia project
-EXPOSE 3000
-
-# Run your application
-CMD ["npm", "run", "start"]
-`
+  const dockerfileContent = fs.readFileSync(
+    path.join(__dirname, '../../../../docker', 'templates', 'MotiaDockerSample'),
+    'utf-8',
+  )
 
   try {
     fs.writeFileSync(dockerfilePath, dockerfileContent)
@@ -71,44 +57,16 @@ CMD ["npm", "run", "start"]
 }
 
 const createDockerignore = async () => {
-  const dockerignoreContent = `# Git
-  .git
-  .gitignore
-  
-  # Python
-  __pycache__/
-  *.py[cod]
-  *$py.class
-  *.so
-  .Python
-  env/
-  venv/
-  ENV/
-  
-  # Node
-  node_modules/
-  npm-debug.log
-  yarn-debug.log
-  yarn-error.log
-  
-  # IDE
-  .vscode/
-  .idea/
-  *.swp
-  *.swo
-  
-  # Local development
-  .env
-  
-  # OS generated files
-  .DS_Store
-  .DS_Store?
-  ._*
-  .Spotlight-V100
-  .Trashes
-  ehthumbs.db
-  Thumbs.db
-  `
+  identifyUser()
+
+  trackEvent('docker_setup_command', {
+    project_name: getProjectIdentifier(process.cwd()),
+  })
+
+  const dockerignoreContent = fs.readFileSync(
+    path.join(__dirname, '../../../../docker', 'templates', '.dockerignore.sample'),
+    'utf-8',
+  )
 
   const dockerignorePath = path.join(process.cwd(), '.dockerignore')
 
